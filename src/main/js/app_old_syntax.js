@@ -9,7 +9,8 @@ var MyPage = React.createClass({
       username: '',
       userid: '',
       useridroom: '',
-      url:''
+      url:'',
+      done: true
     };
     
   },
@@ -28,6 +29,9 @@ var MyPage = React.createClass({
     var name2 = this.state.userid
     var name3 = this.state.useridroom
     var that = this;
+    let cnt=0;
+    let len=" ";
+    let {done } = this.state
     var url = 'http://localhost:8080/api/cutRooms/'
     fetch(url)
     .then(function(response) {
@@ -38,10 +42,11 @@ var MyPage = React.createClass({
     }).then(function(data) {
       // that.setState({ person: data.person });   
       var data2 ={} 
-      console.log(name3)
+      //console.log(name3)
+      // len =  data._embedded.cutRooms.length;
       data._embedded.cutRooms.map((d,idx)=>{
-        if(d.useridroom==name3){
-          console.log(d._links.self.href);
+        if(d.userid==name2&&d.useridroom==name3){
+          len = d._links.self.href
           fetch(d._links.self.href, {
             method: 'PUT',
             headers: {'Content-Type':'application/json'},
@@ -50,11 +55,20 @@ var MyPage = React.createClass({
               userid: d.userid,
               useridroom: " ",
             })
-           })
+           }).then(()=>{
+                that.setState({done:true})
+           }) 
+        }else{
+              that.setState({done:false})
         }
+    cnt++;
       });
-    });
-    ons.notification.alert(name + '<br>' + name2 +'<br>'+ name3);
+      if(len!==" "){
+        ons.notification.alert(name + '<br>' + name2 +'<br>'+ name3);
+      }else if(len==" "){
+        ons.notification.alert("Don't have data user room id ");
+      }
+    })
   },
   handleUsernameChange(e) {
     this.setState({username: e.target.value});
