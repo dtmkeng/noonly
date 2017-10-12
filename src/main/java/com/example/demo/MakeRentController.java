@@ -14,17 +14,17 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Controller
-public class MakeVotesController {
+public class MakeRentController {
     // @Autowired
-    // VotesRepository votesRepository;
+    // RentBillRepository rentBillRepository;
     // @Autowired
-    // CompetitorRepository competitorRepository;
+    // MusicalInstrumentRepository musicalInstrumentRepository;
     // @ResponseBody
     // @RequestMapping(path = "/vote/{id}/point/{point}", method = RequestMethod.GET)
-    // public String votes(@PathVariable Long id,@PathVariable int point) {
-    //     Competitor competitor = this.competitorRepository.findOne(id);
-    //     Votes vote = new Votes(competitor,point);
-    //     this.votesRepository.save(vote);
+    // public String rentbill(@PathVariable String id,@PathVariable Long point) {
+    //     MusicalInstrument musicalInstrument = this.musicalInstrumentRepository.findOne(point);
+    //     RentBill rent = new RentBill(musicalInstrument,id);
+    //     this.rentBillRepository.save(rent);
     //     return "{\"status\":\"Voted\"}";
     // }
 }

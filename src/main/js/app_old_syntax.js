@@ -3,35 +3,45 @@ var ReactDOM = require('react-dom');
 var ons = require('onsenui');
 var Ons = require('react-onsenui');
 var client = require('./client');
+var index = 1;
 var MyPage = React.createClass({
   getInitialState: function() {
     return {
-      username: '',
-      userid: '',
-      useridroom: '',
-      url:'',
-      done: true
+      Name: '',
+      NameId: '',
+      RoomId:'',
+       done: true
+      
     };
+  },
+  renderToolbar: function(route, navigator) {
     
-  },
-  componentDidMount() {
-    console.log("Hello_Go");
-  },
-  renderToolbar() {
+    const backButton = route.hasBackButton
+      ? <Ons.BackButton onClick={this.handleClick.bind(this, navigator)}>Back</Ons.BackButton>
+      : null;
     return (
       <Ons.Toolbar>
-        <div className='center'>ยกเลิกการจองห้อง</div>
+        <div className='left'>{backButton}</div>
+        <div className='center'>{route.title}</div>
       </Ons.Toolbar>
+      
     );
+   
   },
-  handleClick: function() { 
-    var name = this.state.username
-    var name2 = this.state.userid
-    var name3 = this.state.useridroom
+  handleClick: function(navigator) {
+    ons.notification.confirm('Do you really want to go back?')
+      .then((response) => {
+        if (response === 1) {
+          navigator.popPage();
+          index--;
+        }
+      });
+  },
+  Cancel_OnClick(){
+    const {Name,NameId,RoomId,done}= this.state
     var that = this;
     let cnt=0;
     let len=" ";
-    let {done } = this.state
     var url = 'http://localhost:8080/api/cutRooms/'
     fetch(url)
     .then(function(response) {
@@ -43,9 +53,9 @@ var MyPage = React.createClass({
       // that.setState({ person: data.person });   
       var data2 ={} 
       //console.log(name3)
-      // len =  data._embedded.cutRooms.length;
+      //len =  data._embedded.cutRooms.length;
       data._embedded.cutRooms.map((d,idx)=>{
-        if(d.userid==name2&&d.useridroom==name3){
+        if(d.userid==NameId&&d.useridroom==RoomId){
           len = d._links.self.href
           fetch(d._links.self.href, {
             method: 'PUT',
@@ -64,56 +74,136 @@ var MyPage = React.createClass({
     cnt++;
       });
       if(len!==" "){
-        ons.notification.alert(name + '<br>' + name2 +'<br>'+ name3);
+        ons.notification.alert(Name + '<br>' + NameId +'<br>'+ RoomId);
       }else if(len==" "){
         ons.notification.alert("Don't have data user room id ");
       }
     })
   },
-  handleUsernameChange(e) {
-    this.setState({username: e.target.value});
+  handleNameChange(e) {
+    this.setState({name: e.target.value});
   },
-  handleUsernameChange2(e) {
-    this.setState({userid: e.target.value});
+  handleNameIdChange(e) {
+    this.setState({nameId: e.target.value});
   },
-  handleUsernameChange3(e) {
-    this.setState({useridroom: e.target.value});
+  handleRoomIdChange(e) {
+    this.setState({RoomId: e.target.value});
   },
-    render: function() {
-    return (
-      <Ons.Page renderToolbar={this.renderToolbar}>
-      {this.componentDidMount}
-        <section style={{textAlign: 'center'}}>
+
+  pushPage: function(navigator) {
+    navigator.pushPage({
+      title: `ใบบันทึกการยกเลิกห้อง `,
+      hasBackButton: true
+    });
+    if(index===2){
+      index--;
+    }
+    index++;
+  },
+
+  renderPage: function(route, navigator) {
+    if(index==1){
+      return (
+          <Ons.Page key={route.title} renderToolbar={this.renderToolbar.bind(this, route, navigator)}>
+          <Ons.ListHeader>ชื่อ-สกุล : </Ons.ListHeader>
+          <section style={{textAlign: 'center'}}>
+            <p>
+              <Ons.Input
+                value={this.state.name}
+                onChange={this.handleNameChange}
+                modifier='underbar'
+                float
+                placeholder='ชื่อ-สกุล' />
+            </p>
+            </section>
           
-          <p>
-            <Ons.Input
-              value={this.state.username}
-              onChange={this.handleUsernameChange}
-              modifier='underbar'
-              float
-              placeholder='ชื่อ-สกุล' />
+          <Ons.ListHeader>รหัสสมาชิก: </Ons.ListHeader>
+          <section style={{textAlign: 'center'}}>
+            <p>
+              <Ons.Input
+                value={this.state.nameId}
+                onChange={this.handleNameIdChange}
+                modifier='underbar'
+                float
+                placeholder='รหัสสมาชิก' />
+            </p>
+            </section>
+            
+            <Ons.ListHeader>รหัสใบจองห้อง : </Ons.ListHeader>
+            <section style={{textAlign: 'center'}}>
+            <p>
+              <Ons.Input
+                value={this.state.roomId}
+                onChange={this.handleRoomIdChange}
+                modifier='underbar'
+                float
+                placeholder='รหัสใบจองห้อง' />
+            </p>
+            </section>
+            
+          <section style={{margin: '16px', textAlign: 'center'}}>
+            <Ons.Button onClick={this.pushPage.bind(this, navigator)}>Next</Ons.Button>
+          </section>
+        </Ons.Page>
+      );
+      }else 
+      var a = this.state.handleNameChange
+      var b = this.state.handleNameIdChange
+      var h = this.state.handleRoomIdChange
+     return (
+        <Ons.Page key={route.title} renderToolbar={this.renderToolbar.bind(this, route, navigator)}>
+        <Ons.ListHeader>ชื่อ-สกุล {this.state.Name}:</Ons.ListHeader>
+        <Ons.ListHeader>รหัสสมาชิก : {this.state.NameId}</Ons.ListHeader>
+        <Ons.ListHeader>รหัสใบจองห้อง :{this.state.RoomId} </Ons.ListHeader>
+          <section style={{margin: '16px', textAlign: 'center'}}>
+            <Ons.Button onClick={this.Cancel_OnClick.bind(this)}>
+              สำเร็จ
+            </Ons.Button>
+          </section>
+        </Ons.Page>
+      );
+
+        return (
+      <Ons.Page key={route.title} renderToolbar={this.renderToolbar.bind(this, route, navigator)}>
+        <p style={{textAlign: 'center'}}>
+        
+       <p>
+           <Ons.ListHeader>ชื่อ-สกุล : {a}</Ons.ListHeader>
+        
+           <Ons.ListHeader>รหัสสมาชิก :{b} </Ons.ListHeader>
+           
+           <Ons.ListHeader>รหัสใบจองห้อง : {h}</Ons.ListHeader>
+
           </p>
-          <p>
-            <Ons.Input
-              value={this.state.userid}
-              onChange={this.handleUsernameChange2}
-              modifier='underbar'
-              float
-              placeholder='รหัสสมาชิก' />
-          </p>
-          <p>
-            <Ons.Input
-              value={this.state.useridroom}
-              onChange={this.handleUsernameChange3}
-              modifier='underbar'
-              float
-              placeholder='กรอกเลขที่ใบบันทึกการจอง' />
-          </p>
-          <p>
-            <Ons.Button onClick={this.handleClick}>ยืนยัน</Ons.Button>
-          </p>
-        </section>
+        
+     
+      </p>
+     
       </Ons.Page>
+      );
+  },
+handleNameChange(e) {
+    this.setState({Name: e.target.value});
+  },
+
+  handleNameIdChange(e) {
+    this.setState({NameId: e.target.value});
+  },
+  
+  handleRoomIdChange(e) {
+    this.setState({RoomId: e.target.value});
+  },
+
+  render: function() {
+    return (
+      <Ons.Navigator
+        swipeable
+        renderPage={this.renderPage}
+        initialRoute={{
+          title: 'ยกเลิกห้องซ้อมดนตรี',
+          hasBackButton: false
+        }}
+      />
     );
   }
 });
